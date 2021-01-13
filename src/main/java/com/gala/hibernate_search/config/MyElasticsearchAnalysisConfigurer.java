@@ -2,9 +2,8 @@ package com.gala.hibernate_search.config;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
     @Override
     public void configure(ElasticsearchAnalysisConfigurationContext context) {
