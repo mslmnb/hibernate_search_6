@@ -1,6 +1,7 @@
 package com.gala.hibernate_search.service;
 
 import com.gala.hibernate_search.model.Book;
+import com.gala.hibernate_search.model.product.Product;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
@@ -31,6 +32,16 @@ public class SearchService {
 //                        .fields( "title", "authors.name" )
 //                        .matching( "refactoring" ) )
 //                .fetchTotalHitCount();
+        return result.hits();
+    }
+
+    public List<Product> getProductsByName(String name) {
+        SearchSession searchSession = Search.session(entityManager);
+        SearchResult<Product> result = searchSession.search(Product.class)
+                .where(f -> f.match()
+                        .fields("name.ru", "name.kk", "name.qq")
+                        .matching(name)
+                ).fetch(20);
         return result.hits();
     }
 }

@@ -1,6 +1,7 @@
 package com.gala.hibernate_search.controller;
 
 import com.gala.hibernate_search.model.Book;
+import com.gala.hibernate_search.model.product.Product;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -24,7 +25,7 @@ public class InitialController {
     // эту апишку необхожимо запустить, если на момент появления Hibernate Search
     // в базе данных были уже данные. Чтобы проиндексировать эти данные нужно
     // один раз запустить данное апи
-    @GetMapping
+    @GetMapping("/book")
     public ResponseEntity initialBookIndex() {
         SearchSession searchSession = Search.session( entityManager );
         MassIndexer indexer = searchSession.massIndexer( Book.class )
@@ -34,9 +35,21 @@ public class InitialController {
         } catch (InterruptedException e) {
             e.printStackTrace();
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-
         }
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @GetMapping("/product")
+    public ResponseEntity initialProductIndex() {
+        SearchSession searchSession = Search.session( entityManager );
+        MassIndexer indexer = searchSession.massIndexer( Product.class )
+                .threadsToLoadObjects( 7 );
+        try {
+            indexer.startAndWait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity(HttpStatus.OK);
+    }
 }
