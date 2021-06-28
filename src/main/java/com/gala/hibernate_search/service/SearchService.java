@@ -89,6 +89,7 @@ public class SearchService {
 
         List<Product> result = searchSession.search( scope )
                 .where( boolPredicate )
+                .sort(p->p.field("createdAt"))
                 .fetchHits( 20 );
         return result;
     }
