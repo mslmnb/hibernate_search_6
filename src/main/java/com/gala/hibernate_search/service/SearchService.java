@@ -14,13 +14,14 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -45,7 +46,7 @@ public class SearchService {
         return result.hits();
     }
 
-    public List<Product> getProductsByName(String searchPhrase) {
+    public Page<Product> getProductsByName(String searchPhrase, Pageable page) {
 /*  // поиск через лямбда
         SearchSession searchSession = Search.session( entityManager );
         List<Product> hits = searchSession.search( Product.class )
@@ -63,6 +64,7 @@ public class SearchService {
         return hits;
 
  */
+        Integer offset = page.getPageNumber() * page.getPageSize();
 
 //     поиск через предикаты
         SearchSession searchSession = Search.session( entityManager );
@@ -87,10 +89,11 @@ public class SearchService {
 
         SearchPredicate boolPredicate = booleanJunction.toPredicate();
 
-        List<Product> result = searchSession.search( scope )
+        SearchResult<Product> products = searchSession.search( scope )
                 .where( boolPredicate )
                 .sort(p->p.field("createdAt"))
-                .fetchHits( 20 );
+                .fetch( offset, page.getPageSize());
+        Page<Product> result = new PageImpl<>(products.hits(), page, products.total().hitCount());
         return result;
     }
 }
